@@ -2,6 +2,7 @@ package src;
 
 import lombok.Getter;
 import lombok.Setter;
+
 public class Airplane {
     @Getter @Setter
     private int registrationNumber;

@@ -1,6 +1,8 @@
 package src;
 import lombok.Getter;
-import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 public class BoardingManagement {
     @Getter
     private static BoardingManagement instance;
@@ -37,24 +39,32 @@ public class BoardingManagement {
         }
     }
 
-    public void assignAirplane(Airplane airplane, BoardingGate gate) {
-        if (gate.isAvailability()) {
-            gate.setAvailability(false);
-            gate.setAssignedAirplane(airplane);
-            airplane.setGate(gate.getGateNumber());
-            System.out.println("Avión " + airplane.getRegistrationNumber() + " (" + airplane.getAirline() +
-                    ") asignado a la puerta " + gate.getGateNumber());
+    public BoardingGate getBoardingGateByNumber(int gateNumber) {
+        if (gateNumber >= 1 && gateNumber <= gates.length) {
+            return gates[gateNumber - 1];
         } else {
-            System.out.println("La puerta " + gate.getGateNumber() + " está ocupada");
+            return null;
         }
     }
 
-    public BoardingGate getBoardingGateByNumber(int gateNumber) {
-        for (BoardingGate gate : gates) {
-            if (gate.getGateNumber() == gateNumber) {
-                return gate;
-            }
-        }
-        return null;
+    public void assignAirplane(Airplane airplane, BoardingGate gate) {
+        gate.setAvailability(false);
+        gate.setAssignedAirplane(airplane);
+        airplane.setGate(gate.getGateNumber());
+        System.out.println("Avión " + airplane.getRegistrationNumber() + " (" + airplane.getAirline() +
+                ") asignado a la puerta " + gate.getGateNumber());
     }
+  /*  public void assignGate(Airplane airplane, BoardingGate gate) throws Exception {
+        if (gate.isAvailability()) {
+            if (gate.getAssignedAirplane() == null) {
+                gate.setAvailability(false);
+                gate.setAssignedAirplane(airplane);
+                airplane.setGate(gate.getGateNumber());
+            } else {
+                throw new Exception("La puerta " + gate.getGateNumber() + " está ocupada por otro avión.");
+            }
+        } else {
+            throw new Exception("La puerta " + gate.getGateNumber() + " está ocupada.");
+        }
+    }*/
 }

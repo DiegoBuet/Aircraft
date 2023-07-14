@@ -26,7 +26,7 @@ public class Menu {
                 switch (menuInput) {
                     case 1 -> MenuUtils.createAirplane(airplanes, aircraftManagement);
                     case 2 -> MenuUtils.editAirplane(airplanes, aircraftManagement);
-                    case 3 -> MenuUtils.deleteAirplane(airplanes, aircraftManagement);
+                    case 3 -> MenuUtils.deleteAirplane(airplanes, aircraftManagement, boardingManagement);
                     case 4 -> MenuUtils.assignAirplaneToGate(airplanes, aircraftManagement, boardingManagement);
                     case 5 -> boardingManagement.getAvailability(); // Modificar si es necesario
                     case 6 -> System.out.println("Saliendo del programa...");

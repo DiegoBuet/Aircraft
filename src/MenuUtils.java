@@ -104,10 +104,7 @@ public class MenuUtils {
         }
     }
 
-
-
-
-    public static void deleteAirplane(List<Airplane> airplanes, AircraftManagement aircraftManagement) {
+    public static void deleteAirplane(List<Airplane> airplanes, AircraftManagement aircraftManagement, BoardingManagement boardingManagement) {
         List<Airplane> availableAirplanes = getAvailableAirplanes(airplanes);
 
         if (availableAirplanes.isEmpty()) {
@@ -129,6 +126,15 @@ public class MenuUtils {
         if (choice >= 1 && choice <= availableAirplanes.size()) {
             Airplane selectedAirplane = availableAirplanes.get(choice - 1);
 
+            // Liberar la puerta asignada al avión eliminado
+            if (selectedAirplane.getGate() != 0) {
+                BoardingGate gate = boardingManagement.getBoardingGateByNumber(selectedAirplane.getGate());
+                if (gate != null) {
+                    gate.setAssignedAirplane(null);
+                    gate.setAvailability(true);
+                }
+            }
+
             airplanes.remove(selectedAirplane);
             aircraftManagement.deleteAirplane(selectedAirplane);
             System.out.println("Avión eliminado exitosamente.");
@@ -143,6 +149,7 @@ public class MenuUtils {
             System.out.println("Opción inválida. Intente nuevamente.");
         }
     }
+
     private static void showUpdatedAirplanes(List<Airplane> airplanes) {
         System.out.println("Aviones actualizados:");
         for (Airplane updatedAirplane : airplanes) {
@@ -150,6 +157,7 @@ public class MenuUtils {
             System.out.println("------------------------------");
         }
     }
+
     private static void showAvailableAirplanes(List<Airplane> airplanes) {
         System.out.println("Aviones disponibles para asignar una puerta:");
         int index = 1;
@@ -183,17 +191,35 @@ public class MenuUtils {
             int gateNumber = userInput.nextInt();
             userInput.nextLine(); // Consumir el carácter de salto de línea
 
-            BoardingGate gate = boardingManagement.getBoardingGateByNumber(gateNumber);
+            if (gateNumber >= 1 && gateNumber <= 11) {
+                BoardingGate gate = boardingManagement.getBoardingGateByNumber(gateNumber);
 
-            if (gate != null) {
-                try {
-                    aircraftManagement.assignGate(selectedAirplane, gate);
-                    System.out.println("Avión " + selectedAirplane.getRegistrationNumber() + " asignado exitosamente a la puerta " + gateNumber + ".");
-                } catch (Exception e) {
-                    System.out.println("Error al asignar la puerta. Detalles: " + e.getMessage());
+                if (gate != null) {
+                    try {
+                        if (gate.isAvailability()) {
+                            // Eliminar la asignación existente en la puerta, si la hay
+                            if (selectedAirplane.getGate() != 0) {
+                                BoardingGate previousGate = boardingManagement.getBoardingGateByNumber(selectedAirplane.getGate());
+                                if (previousGate != null) {
+                                    previousGate.setAssignedAirplane(null);
+                                    previousGate.setAvailability(true);
+                                }
+                            }
+
+                            // Asignar el avión a la nueva puerta
+                            boardingManagement.assignAirplane(selectedAirplane, gate);
+                            System.out.println("Avión " + selectedAirplane.getRegistrationNumber() + " asignado exitosamente a la puerta " + gateNumber + ".");
+                        } else {
+                            System.out.println("La puerta " + gateNumber + " está ocupada por otro avión.");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error al asignar la puerta. Detalles: " + e.getMessage());
+                    }
+                } else {
+                    System.out.println("La puerta de embarque con el número " + gateNumber + " no existe.");
                 }
             } else {
-                System.out.println("La puerta de embarque con el número " + gateNumber + " no existe.");
+                System.out.println("Número de puerta inválido. Intente nuevamente.");
             }
         } else {
             System.out.println("Opción inválida. Intente nuevamente.");
